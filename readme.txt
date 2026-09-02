@@ -1,6 +1,6 @@
 === Hide Login Secure ===
 Contributors: jackerteo
-Tags: hide login, wp-login, security, brute force, passkey, 2fa, hide admin, login protection, xmlrpc
+Tags: security, hide login, brute force, login protection, 2fa
 Requires at least: 5.8
 Tested up to: 7.1
 Stable tag: 1.0.0
@@ -8,7 +8,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Hide and protect your WordPress login page with a custom URL, short-lived signed access tokens, and smart IP controls. Reduces brute-force exposure without slowing down your site.
+Hide wp-login.php, block brute-force attacks, and protect your admin area with signed tokens and IP controls. Lightweight and secure.
 
 == Description ==
 
