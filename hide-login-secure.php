@@ -5,7 +5,7 @@
  * Description: Hide and protect your WordPress login page with a custom login URL, short-lived signed access protection, IP controls, and login security hardening. Reduces brute-force exposure.
  * Version:     1.0.0
  * Author:      Jacker Architect
- * Author URI:  https://jackerteo.com/plugin
+ * Author URI:  https://github.com/JackerArchitect
  * License:     GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: hide-login-secure
