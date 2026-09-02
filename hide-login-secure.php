@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Hide Login – Secure Admin & Login Protection
+ * Plugin Name: Hide Login Secure
  * Plugin URI:  https://jackerteo.com/plugin
  * Description: Hide and protect your WordPress login page with a custom login URL, short-lived signed access protection, IP controls, and login security hardening. Reduces brute-force exposure.
  * Version:     1.0.0
@@ -21,7 +21,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 const VERSION            = '1.0.0';
 const OPTION_KEY         = 'hls_settings';
-const TEXT_DOMAIN        = 'hide-login-secure';
 const DEFAULT_SLUG       = 'my-login';
 const AUTH_COOKIE_NAME   = 'hls_gate';
 const DB_TABLE           = 'hls_login_events';
@@ -304,8 +303,9 @@ final class Plugin {
         $mode = $this->settings['unauthorized_response'] ?? '404';
         
         switch ( $mode ) {
-            case 'localhost':
-                header( 'Location: http://127.0.0.1/', true, 302 );
+            case '403':
+                status_header( 403 );
+                wp_die( esc_html__( 'Access Denied', 'hide-login-secure' ), esc_html__( '403 - Forbidden', 'hide-login-secure' ), [ 'response' => 403 ] );
                 exit;
             case 'homepage':
                 wp_safe_redirect( home_url() );
@@ -326,7 +326,7 @@ final class Plugin {
         if ( file_exists( $template ) ) {
             include $template;
         } else {
-            wp_die( esc_html__( 'Page not found', TEXT_DOMAIN ), esc_html__( '404 - Not Found', TEXT_DOMAIN ), [ 'response' => 404 ] );
+            wp_die( esc_html__( 'Page not found', 'hide-login-secure' ), esc_html__( '404 - Not Found', 'hide-login-secure' ), [ 'response' => 404 ] );
         }
         exit;
     }
@@ -405,7 +405,7 @@ final class Plugin {
         ];
         foreach ( $patterns as $pattern ) {
             if ( strpos( $error, $pattern ) !== false ) {
-                return '<strong>' . esc_html__( 'ERROR', TEXT_DOMAIN ) . '</strong>: ' . esc_html__( 'Invalid username or password.', TEXT_DOMAIN );
+                return '<strong>' . esc_html__( 'ERROR', 'hide-login-secure' ) . '</strong>: ' . esc_html__( 'Invalid username or password.', 'hide-login-secure' );
             }
         }
         return $error;
@@ -597,8 +597,8 @@ final class Plugin {
 
     public function add_admin_menu(): void {
         add_options_page(
-            __( 'Hide Login Settings', TEXT_DOMAIN ),
-            __( 'Hide Login', TEXT_DOMAIN ),
+            __( 'Hide Login Settings', 'hide-login-secure' ),
+            __( 'Hide Login', 'hide-login-secure' ),
             'manage_options',
             'hide-login-secure',
             [ $this, 'render_main_page' ]
@@ -612,8 +612,8 @@ final class Plugin {
         <div class="wrap">
             <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
             <h2 class="nav-tab-wrapper">
-                <a href="?page=hide-login-secure&tab=settings" class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Settings', TEXT_DOMAIN ); ?></a>
-                <a href="?page=hide-login-secure&tab=events" class="nav-tab <?php echo $active_tab === 'events' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Login Events', TEXT_DOMAIN ); ?></a>
+                <a href="?page=hide-login-secure&tab=settings" class="nav-tab <?php echo $active_tab === 'settings' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Settings', 'hide-login-secure' ); ?></a>
+                <a href="?page=hide-login-secure&tab=events" class="nav-tab <?php echo $active_tab === 'events' ? 'nav-tab-active' : ''; ?>"><?php esc_html_e( 'Login Events', 'hide-login-secure' ); ?></a>
             </h2>
             <?php
             if ( $active_tab === 'settings' ) $this->render_settings_tab();
@@ -627,10 +627,10 @@ final class Plugin {
         $slug = trim( $this->settings['slug'] ?? '', '/' );
         ?>
         <div class="notice notice-info inline" style="margin:15px 0;padding:10px 15px;">
-            <p><strong><?php esc_html_e( 'Hidden Entry URL:', TEXT_DOMAIN ); ?></strong> <code id="hls-url"><?php echo esc_html( home_url( '/' . $slug . '/' ) ); ?></code> 
-            <button type="button" class="button button-small" onclick="navigator.clipboard.writeText(document.getElementById('hls-url').textContent);this.textContent='<?php echo esc_js( __( 'Copied!', TEXT_DOMAIN ) ); ?>';"><?php esc_html_e( 'Copy', TEXT_DOMAIN ); ?></button></p>
+            <p><strong><?php esc_html_e( 'Hidden Entry URL:', 'hide-login-secure' ); ?></strong> <code id="hls-url"><?php echo esc_html( home_url( '/' . $slug . '/' ) ); ?></code> 
+            <button type="button" class="button button-small" onclick="navigator.clipboard.writeText(document.getElementById('hls-url').textContent);this.textContent='<?php echo esc_js( __( 'Copied!', 'hide-login-secure' ) ); ?>';"><?php esc_html_e( 'Copy', 'hide-login-secure' ); ?></button></p>
             <p style="color:#666;font-size:13px;margin-top:10px;">
-                <?php esc_html_e( 'Note: If you encounter a 404 error on first use, please visit Settings > Permalinks and click "Save Changes" to refresh rewrite rules.', TEXT_DOMAIN ); ?>
+                <?php esc_html_e( 'Note: If you encounter a 404 error on first use, please visit Settings > Permalinks and click "Save Changes" to refresh rewrite rules.', 'hide-login-secure' ); ?>
             </p>
         </div>
 
@@ -638,82 +638,82 @@ final class Plugin {
             <?php settings_fields( 'hls_settings_group' ); ?>
             <table class="form-table">
                 <tr>
-                    <th><?php esc_html_e( 'Login Slug', TEXT_DOMAIN ); ?></th>
+                    <th><?php esc_html_e( 'Login Slug', 'hide-login-secure' ); ?></th>
                     <td>
                         <input type="text" name="<?php echo OPTION_KEY; ?>[slug]" value="<?php echo esc_attr( $this->settings['slug'] ); ?>" class="regular-text" placeholder="my-login" />
-                        <p class="description"><?php esc_html_e( 'Enter a single URL slug (lowercase letters, numbers, and hyphens only). Example: my-login', TEXT_DOMAIN ); ?></p>
+                        <p class="description"><?php esc_html_e( 'Enter a single URL slug (lowercase letters, numbers, and hyphens only). Example: my-login', 'hide-login-secure' ); ?></p>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e( 'Login Protection Mode', TEXT_DOMAIN ); ?></th>
+                    <th><?php esc_html_e( 'Login Protection Mode', 'hide-login-secure' ); ?></th>
                     <td>
                         <label>
                             <input type="radio" name="<?php echo OPTION_KEY; ?>[login_protection_mode]" value="compatibility" <?php checked( $this->settings['login_protection_mode'], 'compatibility' ); ?> /> 
-                            <strong><?php esc_html_e( 'Compatibility Mode (Recommended)', TEXT_DOMAIN ); ?></strong><br>
-                            <span class="description"><?php esc_html_e( 'Allows WordPress password reset and recovery links to work normally without the hidden URL.', TEXT_DOMAIN ); ?></span>
+                            <strong><?php esc_html_e( 'Compatibility Mode (Recommended)', 'hide-login-secure' ); ?></strong><br>
+                            <span class="description"><?php esc_html_e( 'Allows WordPress password reset and recovery links to work normally without the hidden URL.', 'hide-login-secure' ); ?></span>
                         </label><br><br>
                         <label>
                             <input type="radio" name="<?php echo OPTION_KEY; ?>[login_protection_mode]" value="strict" <?php checked( $this->settings['login_protection_mode'], 'strict' ); ?> /> 
-                            <strong><?php esc_html_e( 'Strict Mode', TEXT_DOMAIN ); ?></strong><br>
-                            <span class="description"><?php esc_html_e( 'Maximum protection. Requires the hidden login authorization cookie for all wp-login.php requests.', TEXT_DOMAIN ); ?></span>
+                            <strong><?php esc_html_e( 'Strict Mode', 'hide-login-secure' ); ?></strong><br>
+                            <span class="description"><?php esc_html_e( 'Maximum protection. Requires the hidden login authorization cookie for all wp-login.php requests.', 'hide-login-secure' ); ?></span>
                         </label>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e( 'Unauthorized Request Response', TEXT_DOMAIN ); ?></th>
+                    <th><?php esc_html_e( 'Unauthorized Request Response', 'hide-login-secure' ); ?></th>
                     <td>
                         <label>
                             <input type="radio" name="<?php echo OPTION_KEY; ?>[unauthorized_response]" value="404" <?php checked( $this->settings['unauthorized_response'], '404' ); ?> /> 
-                            <strong><?php esc_html_e( 'Return 404 (Recommended)', TEXT_DOMAIN ); ?></strong><br>
-                            <span class="description"><?php esc_html_e( 'Shows a standard "Page Not Found" error.', TEXT_DOMAIN ); ?></span>
+                            <strong><?php esc_html_e( 'Return 404 (Recommended)', 'hide-login-secure' ); ?></strong><br>
+                            <span class="description"><?php esc_html_e( 'Shows a standard "Page Not Found" error.', 'hide-login-secure' ); ?></span>
                         </label><br><br>
                         <label>
-                            <input type="radio" name="<?php echo OPTION_KEY; ?>[unauthorized_response]" value="localhost" <?php checked( $this->settings['unauthorized_response'], 'localhost' ); ?> /> 
-                            <strong><?php esc_html_e( 'Redirect to 127.0.0.1', TEXT_DOMAIN ); ?></strong><br>
-                            <span class="description"><?php esc_html_e( 'Redirects unauthorized requests to 127.0.0.1 to reduce automated scanning and attack traffic (acts as a honeypot).', TEXT_DOMAIN ); ?></span>
+                            <input type="radio" name="<?php echo OPTION_KEY; ?>[unauthorized_response]" value="403" <?php checked( $this->settings['unauthorized_response'], '403' ); ?> /> 
+                            <strong><?php esc_html_e( 'Return 403 Forbidden', 'hide-login-secure' ); ?></strong><br>
+                            <span class="description"><?php esc_html_e( 'Returns a 403 Forbidden error, acting as a honeypot to waste scanner resources.', 'hide-login-secure' ); ?></span>
                         </label><br><br>
                         <label>
                             <input type="radio" name="<?php echo OPTION_KEY; ?>[unauthorized_response]" value="homepage" <?php checked( $this->settings['unauthorized_response'], 'homepage' ); ?> /> 
-                            <strong><?php esc_html_e( 'Redirect to homepage', TEXT_DOMAIN ); ?></strong><br>
-                            <span class="description"><?php esc_html_e( 'Redirects unauthorized requests to the site homepage.', TEXT_DOMAIN ); ?></span>
+                            <strong><?php esc_html_e( 'Redirect to homepage', 'hide-login-secure' ); ?></strong><br>
+                            <span class="description"><?php esc_html_e( 'Redirects unauthorized requests to the site homepage.', 'hide-login-secure' ); ?></span>
                         </label>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e( 'Cookie Security', TEXT_DOMAIN ); ?></th>
+                    <th><?php esc_html_e( 'Cookie Security', 'hide-login-secure' ); ?></th>
                     <td>
                         <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[bind_ip_to_cookie]" value="1" <?php checked( $this->settings['bind_ip_to_cookie'] ); ?> /> 
-                        <?php esc_html_e( 'Bind authorization to visitor IP (Optional).', TEXT_DOMAIN ); ?></label><br>
-                        <span class="description"><?php esc_html_e( 'If enabled, the cookie becomes invalid if the user\'s IP changes.', TEXT_DOMAIN ); ?></span>
+                        <?php esc_html_e( 'Bind authorization to visitor IP (Optional).', 'hide-login-secure' ); ?></label><br>
+                        <span class="description"><?php esc_html_e( 'If enabled, the cookie becomes invalid if the user\'s IP changes.', 'hide-login-secure' ); ?></span>
                     </td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e( 'Whitelist IPs', TEXT_DOMAIN ); ?><br>
+                    <th><?php esc_html_e( 'Whitelist IPs', 'hide-login-secure' ); ?><br>
                     <span class="description">
-                        <?php esc_html_e( 'IPv4 or IPv6. CIDR supported: IPv4 (0-32), IPv6 (0-128). One per line.', TEXT_DOMAIN ); ?><br>
-                        <em style="color:#666;"><?php esc_html_e( 'Security Note: Cloudflare headers are only trusted if the request originates from an official Cloudflare IP range.', TEXT_DOMAIN ); ?></em>
+                        <?php esc_html_e( 'IPv4 or IPv6. CIDR supported: IPv4 (0-32), IPv6 (0-128). One per line.', 'hide-login-secure' ); ?><br>
+                        <em style="color:#666;"><?php esc_html_e( 'Security Note: Cloudflare headers are only trusted if the request originates from an official Cloudflare IP range.', 'hide-login-secure' ); ?></em>
                     </span></th>
                     <td><textarea name="<?php echo OPTION_KEY; ?>[whitelist_ips]" rows="5" class="large-text code"><?php echo esc_textarea( $this->settings['whitelist_ips'] ); ?></textarea></td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e( 'Blacklist IPs', TEXT_DOMAIN ); ?><br>
+                    <th><?php esc_html_e( 'Blacklist IPs', 'hide-login-secure' ); ?><br>
                     <span class="description">
-                        <?php esc_html_e( 'IPv4 or IPv6. CIDR supported: IPv4 (0-32), IPv6 (0-128). One per line.', TEXT_DOMAIN ); ?><br>
-                        <em style="color:#d63638;"><?php esc_html_e( 'Note: Blacklist always takes priority over Whitelist.', TEXT_DOMAIN ); ?></em>
+                        <?php esc_html_e( 'IPv4 or IPv6. CIDR supported: IPv4 (0-32), IPv6 (0-128). One per line.', 'hide-login-secure' ); ?><br>
+                        <em style="color:#d63638;"><?php esc_html_e( 'Note: Blacklist always takes priority over Whitelist.', 'hide-login-secure' ); ?></em>
                     </span></th>
                     <td><textarea name="<?php echo OPTION_KEY; ?>[blacklist_ips]" rows="5" class="large-text code"><?php echo esc_textarea( $this->settings['blacklist_ips'] ); ?></textarea></td>
                 </tr>
                 <tr>
-                    <th><?php esc_html_e( 'Security Options', TEXT_DOMAIN ); ?></th>
+                    <th><?php esc_html_e( 'Security Options', 'hide-login-secure' ); ?></th>
                     <td>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[enable_security_headers]" value="1" <?php checked( $this->settings['enable_security_headers'] ); ?> /> <?php esc_html_e( 'Add basic Security Headers (X-Frame-Options, etc.)', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[enable_logging]" value="1" <?php checked( $this->settings['enable_logging'] ); ?> /> <?php esc_html_e( 'Enable Event Logging (Auto-cleans to keep last 300)', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[block_xmlrpc]" value="1" <?php checked( $this->settings['block_xmlrpc'] ); ?> /> <?php esc_html_e( 'Block XML-RPC', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[block_author_enum]" value="1" <?php checked( $this->settings['block_author_enum'] ); ?> /> <?php esc_html_e( 'Block Author Enumeration', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[block_rest_api_users]" value="1" <?php checked( $this->settings['block_rest_api_users'] ); ?> /> <?php esc_html_e( 'Protect REST API User Enumeration', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[remove_author_body_class]" value="1" <?php checked( $this->settings['remove_author_body_class'] ); ?> /> <?php esc_html_e( 'Remove Username from Body Class', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[hide_author_in_feed]" value="1" <?php checked( $this->settings['hide_author_in_feed'] ); ?> /> <?php esc_html_e( 'Hide Author Name in RSS Feed', TEXT_DOMAIN ); ?></label><br>
-                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[unify_login_errors]" value="1" <?php checked( $this->settings['unify_login_errors'] ); ?> /> <?php esc_html_e( 'Unify Login Error Messages', TEXT_DOMAIN ); ?></label>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[enable_security_headers]" value="1" <?php checked( $this->settings['enable_security_headers'] ); ?> /> <?php esc_html_e( 'Add basic Security Headers (X-Frame-Options, etc.)', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[enable_logging]" value="1" <?php checked( $this->settings['enable_logging'] ); ?> /> <?php esc_html_e( 'Enable Event Logging (Auto-cleans to keep last 300)', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[block_xmlrpc]" value="1" <?php checked( $this->settings['block_xmlrpc'] ); ?> /> <?php esc_html_e( 'Block XML-RPC', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[block_author_enum]" value="1" <?php checked( $this->settings['block_author_enum'] ); ?> /> <?php esc_html_e( 'Block Author Enumeration', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[block_rest_api_users]" value="1" <?php checked( $this->settings['block_rest_api_users'] ); ?> /> <?php esc_html_e( 'Protect REST API User Enumeration', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[remove_author_body_class]" value="1" <?php checked( $this->settings['remove_author_body_class'] ); ?> /> <?php esc_html_e( 'Remove Username from Body Class', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[hide_author_in_feed]" value="1" <?php checked( $this->settings['hide_author_in_feed'] ); ?> /> <?php esc_html_e( 'Hide Author Name in RSS Feed', 'hide-login-secure' ); ?></label><br>
+                        <label><input type="checkbox" name="<?php echo OPTION_KEY; ?>[unify_login_errors]" value="1" <?php checked( $this->settings['unify_login_errors'] ); ?> /> <?php esc_html_e( 'Unify Login Error Messages', 'hide-login-secure' ); ?></label>
                     </td>
                 </tr>
             </table>
@@ -737,11 +737,11 @@ final class Plugin {
         ?>
         
         <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-            <h3><?php printf( esc_html__( 'Login Events — Last 300 Entries (%s total)', TEXT_DOMAIN ), number_format( $total_items ) ); ?></h3>
-            <form method="post" style="margin:0;" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to clear all events?', TEXT_DOMAIN ) ); ?>');">
+            <h3><?php printf( esc_html__( 'Login Events — Last 300 Entries (%s total)', 'hide-login-secure' ), number_format( $total_items ) ); ?></h3>
+            <form method="post" style="margin:0;" onsubmit="return confirm('<?php echo esc_js( __( 'Are you sure you want to clear all events?', 'hide-login-secure' ) ); ?>');">
                 <input type="hidden" name="hls_action" value="clear_events" />
                 <?php wp_nonce_field( 'hls_event_action', 'hls_nonce' ); ?>
-                <button type="submit" class="button button-secondary" style="color:#dc3232; border-color:#dc3232;"><?php esc_html_e( 'Clear All Events', TEXT_DOMAIN ); ?></button>
+                <button type="submit" class="button button-secondary" style="color:#dc3232; border-color:#dc3232;"><?php esc_html_e( 'Clear All Events', 'hide-login-secure' ); ?></button>
             </form>
         </div>
 
@@ -749,15 +749,15 @@ final class Plugin {
             <thead>
                 <tr>
                     <th style="width: 50px;">ID</th>
-                    <th><?php esc_html_e( 'Username', TEXT_DOMAIN ); ?></th>
-                    <th><?php esc_html_e( 'Event Time', TEXT_DOMAIN ); ?></th>
-                    <th><?php esc_html_e( 'User IP', TEXT_DOMAIN ); ?></th>
-                    <th style="width: 250px;"><?php esc_html_e( 'Actions', TEXT_DOMAIN ); ?></th>
+                    <th><?php esc_html_e( 'Username', 'hide-login-secure' ); ?></th>
+                    <th><?php esc_html_e( 'Event Time', 'hide-login-secure' ); ?></th>
+                    <th><?php esc_html_e( 'User IP', 'hide-login-secure' ); ?></th>
+                    <th style="width: 250px;"><?php esc_html_e( 'Actions', 'hide-login-secure' ); ?></th>
                 </tr>
             </thead>
             <tbody>
                 <?php if ( empty( $events ) ) : ?>
-                    <tr><td colspan="5"><?php esc_html_e( 'No events recorded.', TEXT_DOMAIN ); ?></td></tr>
+                    <tr><td colspan="5"><?php esc_html_e( 'No events recorded.', 'hide-login-secure' ); ?></td></tr>
                 <?php else : ?>
                     <?php foreach ( $events as $event ) : ?>
                         <tr>
@@ -766,9 +766,9 @@ final class Plugin {
                             <td><?php echo esc_html( $event->login_time ); ?></td>
                             <td><code><?php echo esc_html( $event->user_ip ); ?></code></td>
                             <td>
-                                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=hide-login-secure&tab=events&hls_action=whitelist_ip&ip=' . urlencode( $event->user_ip ) ), 'hls_event_action', 'hls_nonce' ) ); ?>" class="button button-small"><?php esc_html_e( 'White', TEXT_DOMAIN ); ?></a>
-                                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=hide-login-secure&tab=events&hls_action=blacklist_ip&ip=' . urlencode( $event->user_ip ) ), 'hls_event_action', 'hls_nonce' ) ); ?>" class="button button-small" style="color:#dc3232;"><?php esc_html_e( 'Block', TEXT_DOMAIN ); ?></a>
-                                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=hide-login-secure&tab=events&hls_action=delete_event&id=' . $event->id ), 'hls_event_action', 'hls_nonce' ) ); ?>" class="button button-small button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Delete this event?', TEXT_DOMAIN ) ); ?>');"><?php esc_html_e( 'Delete', TEXT_DOMAIN ); ?></a>
+                                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=hide-login-secure&tab=events&hls_action=whitelist_ip&ip=' . urlencode( $event->user_ip ) ), 'hls_event_action', 'hls_nonce' ) ); ?>" class="button button-small"><?php esc_html_e( 'White', 'hide-login-secure' ); ?></a>
+                                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=hide-login-secure&tab=events&hls_action=blacklist_ip&ip=' . urlencode( $event->user_ip ) ), 'hls_event_action', 'hls_nonce' ) ); ?>" class="button button-small" style="color:#dc3232;"><?php esc_html_e( 'Block', 'hide-login-secure' ); ?></a>
+                                <a href="<?php echo esc_url( wp_nonce_url( admin_url( 'admin.php?page=hide-login-secure&tab=events&hls_action=delete_event&id=' . $event->id ), 'hls_event_action', 'hls_nonce' ) ); ?>" class="button button-small button-link-delete" onclick="return confirm('<?php echo esc_js( __( 'Delete this event?', 'hide-login-secure' ) ); ?>');"><?php esc_html_e( 'Delete', 'hide-login-secure' ); ?></a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
@@ -779,13 +779,13 @@ final class Plugin {
         <?php
         if ( $total_pages > 1 ) {
             echo '<div class="tablenav bottom" style="margin-top: 15px;"><div class="tablenav-pages">';
-            echo '<span class="displaying-num">' . number_format( $total_items ) . ' ' . esc_html__( 'items', TEXT_DOMAIN ) . '</span>';
+            echo '<span class="displaying-num">' . number_format( $total_items ) . ' ' . esc_html__( 'items', 'hide-login-secure' ) . '</span>';
             echo '<span class="pagination-links">';
             
             if ( $current_page > 1 ) {
-                echo '<a class="prev-page button" href="' . esc_url( add_query_arg( 'paged', $current_page - 1 ) ) . '">&lsaquo; ' . esc_html__( 'Prev', TEXT_DOMAIN ) . '</a>';
+                echo '<a class="prev-page button" href="' . esc_url( add_query_arg( 'paged', $current_page - 1 ) ) . '">&lsaquo; ' . esc_html__( 'Prev', 'hide-login-secure' ) . '</a>';
             } else {
-                echo '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo; ' . esc_html__( 'Prev', TEXT_DOMAIN ) . '</span>';
+                echo '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">&lsaquo; ' . esc_html__( 'Prev', 'hide-login-secure' ) . '</span>';
             }
 
             echo '<span class="paging-input">';
@@ -802,9 +802,9 @@ final class Plugin {
             echo '</span>';
 
             if ( $current_page < $total_pages ) {
-                echo '<a class="next-page button" href="' . esc_url( add_query_arg( 'paged', $current_page + 1 ) ) . '">' . esc_html__( 'Next', TEXT_DOMAIN ) . ' &rsaquo;</a>';
+                echo '<a class="next-page button" href="' . esc_url( add_query_arg( 'paged', $current_page + 1 ) ) . '">' . esc_html__( 'Next', 'hide-login-secure' ) . ' &rsaquo;</a>';
             } else {
-                echo '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">' . esc_html__( 'Next', TEXT_DOMAIN ) . ' &rsaquo;</span>';
+                echo '<span class="tablenav-pages-navspan button disabled" aria-hidden="true">' . esc_html__( 'Next', 'hide-login-secure' ) . ' &rsaquo;</span>';
             }
             echo '</span></div></div>';
         }
@@ -814,10 +814,10 @@ final class Plugin {
         $action = $_GET['hls_action'] ?? $_POST['hls_action'] ?? '';
         if ( empty( $action ) ) return;
         
-        if ( ! current_user_can( 'manage_options' ) ) wp_die( esc_html__( 'Permission denied.', TEXT_DOMAIN ) );
+        if ( ! current_user_can( 'manage_options' ) ) wp_die( esc_html__( 'Permission denied.', 'hide-login-secure' ) );
 
         $nonce = $_GET['hls_nonce'] ?? $_POST['hls_nonce'] ?? '';
-        if ( ! wp_verify_nonce( $nonce, 'hls_event_action' ) ) wp_die( esc_html__( 'Security check failed.', TEXT_DOMAIN ) );
+        if ( ! wp_verify_nonce( $nonce, 'hls_event_action' ) ) wp_die( esc_html__( 'Security check failed.', 'hide-login-secure' ) );
 
         global $wpdb;
         $table_name = $wpdb->prefix . DB_TABLE;
@@ -862,10 +862,10 @@ final class Plugin {
         $raw_slug = isset( $input['slug'] ) ? sanitize_title( $input['slug'] ) : '';
         
         if ( ! preg_match( '/^[a-z0-9]+(?:-[a-z0-9]+)*$/', $raw_slug ) ) {
-            add_settings_error( OPTION_KEY, 'invalid_slug_format', __( 'Invalid slug format. Use only lowercase letters, numbers, and hyphens (e.g., my-login).', TEXT_DOMAIN ) );
+            add_settings_error( OPTION_KEY, 'invalid_slug_format', __( 'Invalid slug format. Use only lowercase letters, numbers, and hyphens (e.g., my-login).', 'hide-login-secure' ) );
             $sanitized['slug'] = ! empty( $this->settings['slug'] ) ? $this->settings['slug'] : DEFAULT_SLUG;
         } elseif ( in_array( $raw_slug, $this->reserved_slugs, true ) ) {
-            add_settings_error( OPTION_KEY, 'reserved_slug', __( 'This slug is reserved by WordPress core. Please choose another.', TEXT_DOMAIN ) );
+            add_settings_error( OPTION_KEY, 'reserved_slug', __( 'This slug is reserved by WordPress core. Please choose another.', 'hide-login-secure' ) );
             $sanitized['slug'] = ! empty( $this->settings['slug'] ) ? $this->settings['slug'] : DEFAULT_SLUG;
         } else {
             $query = new \WP_Query( [
@@ -878,7 +878,7 @@ final class Plugin {
             ] );
             
             if ( $query->have_posts() ) {
-                add_settings_error( OPTION_KEY, 'slug_conflict_post', __( 'This slug is already in use by an existing page or post.', TEXT_DOMAIN ) );
+                add_settings_error( OPTION_KEY, 'slug_conflict_post', __( 'This slug is already in use by an existing page or post.', 'hide-login-secure' ) );
                 $sanitized['slug'] = ! empty( $this->settings['slug'] ) ? $this->settings['slug'] : DEFAULT_SLUG;
             } else {
                 $terms = get_terms( [
@@ -890,7 +890,7 @@ final class Plugin {
                 ] );
                 
                 if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-                    add_settings_error( OPTION_KEY, 'slug_conflict_term', __( 'This slug is already in use by an existing category or tag.', TEXT_DOMAIN ) );
+                    add_settings_error( OPTION_KEY, 'slug_conflict_term', __( 'This slug is already in use by an existing category or tag.', 'hide-login-secure' ) );
                     $sanitized['slug'] = ! empty( $this->settings['slug'] ) ? $this->settings['slug'] : DEFAULT_SLUG;
                 } else {
                     $sanitized['slug'] = $raw_slug;
@@ -898,7 +898,7 @@ final class Plugin {
             }
         }
         
-        $valid_responses = [ '404', 'localhost', 'homepage' ];
+        $valid_responses = [ '404', '403', 'homepage' ];
         $sanitized['unauthorized_response'] = in_array( $input['unauthorized_response'] ?? '', $valid_responses ) ? $input['unauthorized_response'] : '404';
 
         $valid_modes = [ 'compatibility', 'strict' ];
@@ -958,12 +958,12 @@ final class Plugin {
     public function plugin_action_links( array $links, string $plugin_file ): array {
         if ( plugin_basename( __FILE__ ) !== $plugin_file ) return $links;
 
-        $settings_link = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=hide-login-secure' ), esc_html__( 'Settings', TEXT_DOMAIN ) );
+        $settings_link = sprintf( '<a href="%s">%s</a>', admin_url( 'options-general.php?page=hide-login-secure' ), esc_html__( 'Settings', 'hide-login-secure' ) );
         array_unshift( $links, $settings_link );
 
         if ( current_user_can( 'manage_options' ) ) {
             $reset_url = wp_nonce_url( admin_url( 'plugins.php?hls_action=reset_settings' ), 'hls_reset_settings', 'hls_nonce' );
-            $reset_link = sprintf( '<a href="%s" onclick="return confirm(\'%s\');" style="color:#dc3232;">%s</a>', esc_url( $reset_url ), esc_js( __( 'Are you sure? This will reset all settings to default.', TEXT_DOMAIN ) ), esc_html__( 'Reset Settings', TEXT_DOMAIN ) );
+            $reset_link = sprintf( '<a href="%s" onclick="return confirm(\'%s\');" style="color:#dc3232;">%s</a>', esc_url( $reset_url ), esc_js( __( 'Are you sure? This will reset all settings to default.', 'hide-login-secure' ) ), esc_html__( 'Reset Settings', 'hide-login-secure' ) );
             $links[] = $reset_link;
         }
         return $links;
@@ -971,8 +971,8 @@ final class Plugin {
 
     public function handle_reset_request(): void {
         if ( ! isset( $_GET['hls_action'] ) || $_GET['hls_action'] !== 'reset_settings' ) return;
-        if ( ! current_user_can( 'manage_options' ) ) wp_die( esc_html__( 'Permission denied.', TEXT_DOMAIN ) );
-        if ( ! isset( $_GET['hls_nonce'] ) || ! wp_verify_nonce( $_GET['hls_nonce'], 'hls_reset_settings' ) ) wp_die( esc_html__( 'Security check failed.', TEXT_DOMAIN ) );
+        if ( ! current_user_can( 'manage_options' ) ) wp_die( esc_html__( 'Permission denied.', 'hide-login-secure' ) );
+        if ( ! isset( $_GET['hls_nonce'] ) || ! wp_verify_nonce( $_GET['hls_nonce'], 'hls_reset_settings' ) ) wp_die( esc_html__( 'Security check failed.', 'hide-login-secure' ) );
 
         delete_option( OPTION_KEY );
         wp_safe_redirect( admin_url( 'plugins.php?hls_reset_success=1' ) );
@@ -983,10 +983,10 @@ final class Plugin {
         if ( ! isset( $_GET['hls_reset_success'] ) || $_GET['hls_reset_success'] !== '1' ) return;
         ?>
         <div class="notice notice-warning is-dismissible" style="border-left-color: #dc3232; padding: 15px;">
-            <h3 style="margin-top: 0; color: #dc3232;"><?php esc_html_e( '⚠️ Settings Reset to Default!', TEXT_DOMAIN ); ?></h3>
-            <p><?php esc_html_e( 'All plugin settings have been cleared. The plugin is now using default values.', TEXT_DOMAIN ); ?></p>
+            <h3 style="margin-top: 0; color: #dc3232;"><?php esc_html_e( '⚠️ Settings Reset to Default!', 'hide-login-secure' ); ?></h3>
+            <p><?php esc_html_e( 'All plugin settings have been cleared. The plugin is now using default values.', 'hide-login-secure' ); ?></p>
             <p style="font-size: 16px; background: #fff; padding: 10px; border: 1px solid #dc3232;">
-                <strong><?php esc_html_e( 'Your current entry URL is now:', TEXT_DOMAIN ); ?></strong><br>
+                <strong><?php esc_html_e( 'Your current entry URL is now:', 'hide-login-secure' ); ?></strong><br>
                 <code style="font-size: 18px;"><?php echo esc_html( home_url( '/' . DEFAULT_SLUG . '/' ) ); ?></code>
             </p>
         </div>
