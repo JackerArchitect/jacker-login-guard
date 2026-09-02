@@ -1,5 +1,5 @@
 === Hide Login – Secure Admin & Login Protection ===
-Contributors: jackerarchitect
+Contributors: jackerteo
 Tags: hide login, wp-login, security, brute force, passkey, 2fa, hide admin, login protection, xmlrpc
 Requires at least: 5.8
 Tested up to: 6.6
@@ -68,3 +68,13 @@ When enabled, unauthorized requests (like bots scanning for `wp-login.php`) are 
 * Blocks XML-RPC and REST API user enumeration.
 * Lightweight Login Events logging (auto-cleans to 300 entries).
 * Compatibility and Strict login protection modes.
+
+== Support & Development ==
+
+This plugin is built, maintained, and supported by an independent developer. 
+
+* **Official Website:** [https://jackerteo.com/plugin](https://jackerteo.com/plugin)
+* **Source Code (GitHub):** [https://github.com/JackerArchitect/hide-login-secure](https://github.com/JackerArchitect/hide-login-secure)
+* **Support Email:** [support@jackerteo.com](mailto:support@jackerteo.com)
+
+If you find this plugin helpful, please consider [leaving a review](https://wordpress.org/support/plugin/hide-login-secure/reviews/) or supporting future development!
