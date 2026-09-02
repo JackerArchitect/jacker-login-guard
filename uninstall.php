@@ -1,29 +1,28 @@
 <?php
 /**
- * Uninstall script for Hide Login – Secure Admin & Login Protection.
+ * Uninstall script for Hide Login Secure
  * 
- * This file runs when the plugin is deleted via the WordPress admin.
- * It cleans up all database tables, options, and transients created by the plugin.
- *
- * @package HideLoginSecure
+ * This file is automatically executed by WordPress when the user deletes 
+ * the plugin from the Plugins screen.
  */
 
-// Exit if not called by WordPress uninstall process
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-    exit;
+	exit;
 }
 
-global $wpdb;
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+$hls_settings = get_option( 'hls_settings', [] );
 
-// 1. Drop the custom database table
-$table_name = $wpdb->prefix . 'hls_login_events';
-$wpdb->query( "DROP TABLE IF EXISTS $table_name" );
+if ( empty( $hls_settings['uninstall_remove_data'] ) ) {
+	return;
+}
 
-// 2. Delete plugin options
 delete_option( 'hls_settings' );
-
-// 3. Delete transients (cached data)
 delete_transient( 'hls_cloudflare_ips' );
 
-// 4. Flush rewrite rules to ensure no leftover routing conflicts
-flush_rewrite_rules();
+global $wpdb;
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
+$hls_table_name = $wpdb->prefix . 'hls_login_events';
+
+// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, PluginCheck.Security.DirectDB.UnescapedDBParameter
+$wpdb->query( "DROP TABLE IF EXISTS {$hls_table_name}" );
