@@ -1,8 +1,8 @@
-=== Hide Login – Secure Admin & Login Protection ===
+=== Hide Login Secure ===
 Contributors: jackerteo
 Tags: hide login, wp-login, security, brute force, passkey, 2fa, hide admin, login protection, xmlrpc
 Requires at least: 5.8
-Tested up to: 6.6
+Tested up to: 7.1
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -12,7 +12,7 @@ Hide and protect your WordPress login page with a custom URL, short-lived signed
 
 == Description ==
 
-Most "hide login" plugins only change the URL. **Hide Login – Secure Admin & Login Protection** goes further. It hides your login page, protects it with short-lived signed cookies, and blocks unauthorized access attempts intelligently. 
+Most "hide login" plugins only change the URL. **Hide Login Secure** goes further. It hides your login page, protects it with short-lived signed cookies, and blocks unauthorized access attempts intelligently. 
 
 It is designed to be **extremely lightweight**, ensuring your website speed is never compromised by heavy security scripts.
 
@@ -49,8 +49,8 @@ Yes! Our signed cookie mechanism is designed to be fully compatible with WordPre
 = Will this slow down my website? =
 No. The plugin uses extremely lightweight PHP hooks and object caching. It does not load any heavy scripts or stylesheets on your frontend pages.
 
-= How does the "Redirect to 127.0.0.1" option work? =
-When enabled, unauthorized requests (like bots scanning for `wp-login.php`) are redirected to the visitor's own localhost (127.0.0.1). This acts as a honeypot, wasting the scanner's resources and reducing server load.
+= How does the "Return 403 Forbidden" option work? =
+When enabled, unauthorized requests (like bots scanning for `wp-login.php`) are immediately rejected with a 403 Forbidden error. This acts as a honeypot, wasting the scanner's resources and reducing server load.
 
 == Screenshots ==
 
