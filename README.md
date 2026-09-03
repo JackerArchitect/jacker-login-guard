@@ -34,7 +34,7 @@ Most security plugins are heavy, slow down your site, and break modern authentic
 ### Core Protection (Free)
 - **Hidden Entry URL:** Completely removes `wp-login.php` and `wp-admin` from public view.
 - **Signed Access Tokens:** Generates a 5-minute, cryptographically signed cookie to access the login page.
-- **Smart Null Routing:** Redirects malicious scanners to `127.0.0.1` (localhost), wasting their resources.
+- **Smart Blocking:** Returns 404 or 403 to unauthorized scanners, effectively hiding your site's existence and acting as a honeypot to waste their resources.
 - **IP Controls:** Manual Whitelist and Blacklist with full IPv4/IPv6 and CIDR support.
 - **Passkey & 2FA Friendly:** Fully compatible with WordPress 6.3+ Passkeys and popular 2FA plugins.
 - **Anti-Enumeration:** Blocks XML-RPC, REST API user enumeration, and author scanning.
