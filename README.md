@@ -4,13 +4,26 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-orange.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
 [![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-purple)](https://php.net/)
 
-**Hide Login Secure** is a lightweight, zero-bloat WordPress plugin designed to protect your login page from brute-force attacks and unauthorized access. Unlike traditional "hide login" plugins, it uses cryptographically signed access tokens to ensure that only authorized users can even see the login form.
+> 🛡️ **Built after hackers installed a backdoor on my WordPress site.** Now it's finally quiet.
+
+---
+
+## 📖 The Origin Story
+
+My journey with WordPress security started out of pure frustration. My site was repeatedly targeted:
+1. Hackers kept resetting my admin and user passwords.
+2. They escalated to mass-creating fake admin accounts.
+3. Finally, they crossed the line by installing a malicious backdoor plugin to steal my data.
+
+I was stuck in an endless loop of cleaning up the mess. Existing security plugins were either too bloated, destroyed my site's performance, or broke modern features like Passkeys. 
+
+So, I analyzed the attack vectors myself and built **Hide Login Secure** from scratch. Now that my site is secure, I’m open-sourcing it to help other WordPress site owners fight back against these attacks without the bloat.
 
 ---
 
 ## 🛡️ Why Choose This Plugin?
 
-Most security plugins are heavy, slow down your site, and break modern authentication features like Passkeys. **Hide Login Secure** is built differently:
+Most security plugins are heavy, slow down your site, and break modern authentication features. **Hide Login Secure** is built differently:
 
 - **True Security:** It doesn't just change the URL; it enforces a short-lived, HMAC-SHA256 signed cookie. Even if a bot guesses your secret URL, it cannot access the login page without a valid token.
 - **Zero Bloat:** No heavy JavaScript, no external API calls on the frontend. Pure, optimized PHP that respects your Core Web Vitals.
@@ -47,7 +60,7 @@ Most security plugins are heavy, slow down your site, and break modern authentic
 
 ---
 
-##  Frequently Asked Questions
+## ❓ Frequently Asked Questions
 
 **What happens if I forget my Secret Entry URL?**
 If you have access to your hosting file manager or FTP, you can rename the plugin folder (e.g., to `hide-login-secure-disabled`) to temporarily disable it and log in via the standard `wp-login.php`. Once logged in, reactivate the plugin and check the settings.
@@ -60,13 +73,13 @@ No. The plugin uses extremely lightweight PHP hooks and object caching. It does 
 
 ---
 
-##  Support Development
+## ☕ Support Development
 
 This plugin is built, maintained, and supported by an independent developer. There are no premium upsells, no tracking, and no bloat in the free version.
 
 If this plugin has saved your website from attacks or saved you hours of debugging, consider supporting the development:
 
-- **Solana (SOL) Mainnet:**
+- **Solana (SOL) Mainnet:**  
   `EHHPsci6pKbfL71t73KNCXrtanM1TWPrWYJZ1ik1b5FH`
 
 - **Contact:** [support@jackerteo.com](mailto:support@jackerteo.com)
@@ -76,7 +89,7 @@ If this plugin has saved your website from attacks or saved you hours of debuggi
 
 ## 📄 License
 
-This plugin is licensed under the **GNU General Public License v2.0 (GPLv2)**.
+This plugin is licensed under the **GNU General Public License v2.0 (GPLv2)**.  
 See the [LICENSE](LICENSE) file for more details.
 
 ---
