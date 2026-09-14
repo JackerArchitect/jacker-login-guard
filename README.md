@@ -1,75 +1,99 @@
-# Hide Login Secure
 
-[![WordPress Plugin](https://img.shields.io/badge/WordPress-Plugin-blue)](https://wordpress.org/plugins/hide-login-secure/)
-[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-orange.svg)](https://www.gnu.org/licenses/gpl-2.0.html)
-[![PHP Version](https://img.shields.io/badge/PHP-7.4%2B-purple)](https://php.net/)
+### What is the Access Log?
 
-> 🛡️ **Built after hackers installed a backdoor on my WordPress site.** Now it's finally quiet.
+The Access Log records requests to sensitive resources, including:
 
----
+- Login page attempts (allowed and blocked)
+- wp-admin access attempts
+- REST API calls (whitelisted endpoints)
+- XML-RPC requests
+- Configuration file access attempts
 
-## 📖 The Origin Story
+Each entry shows the target path, the referer (where the request came from), and whether it was allowed or blocked.
 
-My journey with WordPress security started out of pure frustration. My site was repeatedly targeted:
-1. Hackers kept resetting my admin and user passwords.
-2. They escalated to mass-creating fake admin accounts.
-3. Finally, they crossed the line by installing a malicious backdoor plugin to steal my data.
+**Normal page views (homepage, posts, categories) are NOT logged.**
 
-I was stuck in an endless loop of cleaning up the mess. Existing security plugins were either too bloated, destroyed my site's performance, or broke modern features like Passkeys. 
+### Which IP formats are supported?
 
-So, I analyzed the attack vectors myself and built **Hide Login Secure** from scratch. Now that my site is secure, I’m open-sourcing it to help other WordPress site owners fight back against these attacks without the bloat.
+Whitelist and Blacklist accept one entry per line:
 
----
-
-## 🛡️ Why Choose This Plugin?
-
-Most security plugins are heavy, slow down your site, and break modern authentication features. **Hide Login Secure** is built differently:
-
-- **True Security:** It doesn't just change the URL; it enforces a short-lived, HMAC-SHA256 signed cookie. Even if a bot guesses your secret URL, it cannot access the login page without a valid token.
-- **Zero Bloat:** No heavy JavaScript, no external API calls on the frontend. Pure, optimized PHP that respects your Core Web Vitals.
-- **Cloudflare Aware:** Securely detects real visitor IPs behind Cloudflare proxies without spoofing vulnerabilities.
-
-## ✨ Features
-
-### Core Protection (Free)
-- **Hidden Entry URL:** Completely removes `wp-login.php` and `wp-admin` from public view.
-- **Signed Access Tokens:** Generates a 5-minute, cryptographically signed cookie to access the login page.
-- **Smart Blocking:** Returns 404 or 403 to unauthorized scanners, effectively hiding your site's existence and acting as a honeypot to waste their resources.
-- **IP Controls:** Manual Whitelist and Blacklist with full IPv4/IPv6 and CIDR support.
-- **Passkey & 2FA Friendly:** Fully compatible with WordPress 6.3+ Passkeys and popular 2FA plugins.
-- **Anti-Enumeration:** Blocks XML-RPC, REST API user enumeration, and author scanning.
-- **Login Events Log:** Keeps a lightweight log of the last 300 successful logins.
-
-### 🚀 Pro Version (Coming Soon)
-*Based on community feedback, the following features are in development:*
-- **Smart Auto-Ban:** Automatically block IPs after X failed login attempts.
-- **Forced 2FA/Passkey:** Disable password login for Administrators entirely.
-- **Country Blocking:** Block login attempts from specific countries using GeoIP.
-- **Real-time Alerts:** Email notifications for suspicious login attempts.
-- **Emergency Recovery:** Master recovery system for locked-out administrators.
+| Format | Example |
+|--------|---------|
+| Single IPv4 | `192.168.1.100` |
+| Single IPv6 | `2001:db8::1` |
+| IPv4 CIDR | `192.168.1.0/24` |
+| IPv6 CIDR | `2001:db8::/32` |
+| IPv4 range | `192.168.1.10-192.168.1.50` |
+| IPv6 range | `2001:db8::1-2001:db8::ffff` |
+| With comment | `192.168.1.100 # My Office` |
 
 ---
 
-## 📥 Installation
+## 🔒 External Services
 
-1. Upload the `hide-login-secure` folder to the `/wp-content/plugins/` directory.
-2. Activate the plugin through the 'Plugins' menu in WordPress.
-3. Go to **Settings > Hide Login** to configure your Secret Entry URL.
-4. **Important:** Bookmark your new Secret Entry URL immediately! You will need it to log in.
-5. *(Optional)* If you encounter a 404 on first use, go to **Settings > Permalinks** and click "Save Changes" to refresh rewrite rules.
+This plugin connects to two external services. Both are optional and cached to minimize requests.
+
+### 1. Cloudflare API
+
+Fetches official Cloudflare IP ranges from `https://api.cloudflare.com/client/v4/ips` to correctly detect real visitor IPs behind Cloudflare CDN.
+
+- **Data sent:** None (just a standard HTTPS GET request)
+- **Cached:** 7 days
+- [Terms of Service](https://www.cloudflare.com/terms/) · [Privacy Policy](https://www.cloudflare.com/privacypolicy/)
+
+### 2. IP Geolocation API (IP-API.com)
+
+Uses `http://ip-api.com` to detect the country of IP addresses shown in the admin logs.
+
+- **Data sent:** The visitor IP address
+- **Cached:** 7 days
+- [Terms of Service](https://ip-api.com/legal)
 
 ---
 
-## ❓ Frequently Asked Questions
+## 🖼️ Screenshots
 
-**What happens if I forget my Secret Entry URL?**
-If you have access to your hosting file manager or FTP, you can rename the plugin folder (e.g., to `hide-login-secure-disabled`) to temporarily disable it and log in via the standard `wp-login.php`. Once logged in, reactivate the plugin and check the settings.
+1. The Dashboard showing real-time statistics.
+2. The Settings page with all configuration options.
+3. The Login Events log.
+4. The Access Log with referer information and status filter.
+5. The Auto Block List with block reason, block time, and expiry.
 
-**Does this plugin support Passkeys and 2FA?**
-Yes! Our signed cookie mechanism is designed to be fully compatible with WordPress 6.3+ Passkeys and popular 2FA plugins. It does not interfere with the authentication flow.
+---
 
-**Will this slow down my website?**
-No. The plugin uses extremely lightweight PHP hooks and object caching. It does not load any heavy scripts or stylesheets on your frontend pages.
+## 📄 Changelog
+
+### 1.0.0
+
+- Initial public release.
+- Hidden login URL with HMAC-SHA256 signed access cookies.
+- Protection against direct `wp-login.php` and `wp-admin` access.
+- IP Whitelist and Blacklist with IPv4 / IPv6 / CIDR / Range support.
+- Cloudflare-aware IP detection.
+- Blocks XML-RPC and REST API user enumeration.
+- Three logging systems: Login Events, Access Log, Auto Block List.
+- Automatic attack detection and blocking.
+- Configurable auto-block trigger threshold.
+- Configurable auto-block duration with automatic unblock.
+- Configurable escalation to permanent blacklist.
+- Trusted IP window after successful login.
+- Admin operation audit with 15-minute deduplication.
+- Bulk actions (Whitelist, Blacklist, Remove) on all logs.
+- Access Log records referer information and supports status filter.
+- IP country detection with flag emojis.
+- Dashboard with real-time statistics.
+- Log retention limit setting.
+- Security headers.
+- Import / Export settings.
+
+---
+
+## 🔗 Links
+
+- **WordPress.org:** https://wordpress.org/plugins/jacker-login-guard/
+- **Source Code (GitHub):** https://github.com/JackerArchitect/jacker-login-guard
+- **Support Email:** support@jackerteo.com
+- **Website:** https://jackerteo.com/plugin
 
 ---
 
@@ -81,9 +105,6 @@ If this plugin has saved your website from attacks or saved you hours of debuggi
 
 - **Solana (SOL) Mainnet:**  
   `EHHPsci6pKbfL71t73KNCXrtanM1TWPrWYJZ1ik1b5FH`
-
-- **Contact:** [support@jackerteo.com](mailto:support@jackerteo.com)
-- **Website:** [jackerteo.com/plugin](https://jackerteo.com/plugin)
 
 ---
 
